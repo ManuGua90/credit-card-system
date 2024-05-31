@@ -32,9 +32,9 @@ app.get('/verificar_conexion', (req, res) => {
 
 // Ruta de registro de usuarios
 app.post('/usuarios', (req, res) => {
-  const { nombre, apellido, email, contraseña } = req.body;
-  const hashedPassword = bcrypt.hashSync(contraseña, 10);
-  const query = 'INSERT INTO usuarios (nombre, apellido, email, contraseña) VALUES (?, ?, ?, ?)';
+  const { nombre, apellido, email, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  const query = 'INSERT INTO usuarios (nombre, apellido, email, password) VALUES (?, ?, ?, ?)';
   db.query(query, [nombre, apellido, email, hashedPassword], (error, results) => {
     if (error) {
       console.error('Error al registrar usuario:', error);
@@ -47,7 +47,7 @@ app.post('/usuarios', (req, res) => {
 
 // Ruta de autenticación de usuarios
 app.post('/login', (req, res) => {
-  const { email, contraseña } = req.body;
+  const { email, password } = req.body;
   const query = 'SELECT * FROM usuarios WHERE email = ?';
   db.query(query, [email], (error, results) => {
     if (error) {
@@ -57,15 +57,21 @@ app.post('/login', (req, res) => {
       res.status(401).json({ mensaje: 'Credenciales inválidas' });
     } else {
       const user = results[0];
-      if (bcrypt.compareSync(contraseña, user.contraseña)) {
-        const token = jwt.sign({ userId: user.id }, 'secreto', { expiresIn: '1h' });
+      console.log("Autenticación exitosa: ", bcrypt.compareSync(password, user.password));
+
+      if (bcrypt.compareSync(password, user.password)) {
+        console.log("correcto")
+        const token = jwt.sign({ userId: user.id_usuario }, 'secreto', { expiresIn: '1h' });
         res.status(200).json({ token });
       } else {
+        console.log("incorrecto")
         res.status(401).json({ mensaje: 'Credenciales inválidas' });
       }
     }
   });
 });
+
+
 
 // Middleware de autenticación
 const authenticateToken = (req, res, next) => {
@@ -86,19 +92,19 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Ruta protegida para obtener las tarjetas del usuario autenticado
-app.get('/tarjetas', authenticateToken, (req, res) => {
+app.get('/usuario/tarjetas', authenticateToken, (req, res) => {
   const query = 'SELECT * FROM tarjetas WHERE id_usuario = ?';
   db.query(query, [req.userId], (error, results) => {
     if (error) {
       console.error('Error al obtener tarjetas:', error);
       res.status(500).json({ mensaje: 'Error al obtener tarjetas' });
     } else {
+      console.log(results)
       res.status(200).json(results);
     }
   });
 });
 
-// Ruta protegida para obtener las transacciones del usuario autenticado
 app.get('/transacciones', authenticateToken, (req, res) => {
     const query = `
       SELECT t.id, t.monto, t.fecha, t.descripcion, tc.numero_tarjeta 
@@ -144,7 +150,22 @@ app.get('/transacciones', authenticateToken, (req, res) => {
     });
   });
 
+
+  // Ruta protegida para obtener los datos del usuario autenticado
+app.get('/usuario', authenticateToken, (req, res) => {
+  const query = 'SELECT * FROM usuarios WHERE id_usuario = ?';
+  
+  db.query(query, [req.userId], (error, results) => {
+    if (error) {
+      console.error('Error al obtener los datos del usuario:', error);
+      res.status(500).json({ mensaje: 'Error al obtener los datos del usuario' });
+    } else {
+      const usuario = results[0];
+      res.status(200).json(usuario);
+    }
+  });
+});
 // Inicia el servidor
-app.listen(3000, () => {
-  console.log('Servidor iniciado en el puerto 3000');
+app.listen(3001, () => {
+  console.log('Servidor iniciado en el puerto 3001');
 });
