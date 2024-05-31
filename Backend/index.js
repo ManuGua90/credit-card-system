@@ -99,7 +99,6 @@ app.get('/usuario/tarjetas', authenticateToken, (req, res) => {
       console.error('Error al obtener tarjetas:', error);
       res.status(500).json({ mensaje: 'Error al obtener tarjetas' });
     } else {
-      console.log(results)
       res.status(200).json(results);
     }
   });
@@ -165,6 +164,99 @@ app.get('/usuario', authenticateToken, (req, res) => {
     }
   });
 });
+
+
+
+//#region tarjetas
+// Ruta para solicitar una nueva tarjeta
+const generateCardNumber = () => {
+  let result = '';
+  for (let i = 0; i < 16; i++) {
+    result += Math.floor(Math.random() * 10);
+  }
+  return result;
+};
+
+const generateCVV = () => {
+  let result = '';
+  for (let i = 0; i < 3; i++) {
+    result += Math.floor(Math.random() * 10);
+  }
+  return result;
+};
+
+const generateExpiryDate = () => {
+  const today = new Date();
+  const futureYear = today.getFullYear() + 5;
+  return `${futureYear}-${today.getMonth() + 1}-${today.getDate()}`;
+};
+
+app.post('/tarjetas/solicitar', authenticateToken, (req, res) => {
+  const usuarioId = req.userId; // Asumiendo que tienes un middleware que establece esto
+
+  const numero_tarjeta = generateCardNumber();
+  const cvv = generateCVV();
+  const fecha_vencimiento = generateExpiryDate();
+
+  const query = 'INSERT INTO tarjetas (id_usuario, numero_tarjeta, fecha_vencimiento, cvv) VALUES (?, ?, ?, ?)';
+  db.query(query, [usuarioId, numero_tarjeta, fecha_vencimiento, cvv], (error, results) => {
+    if (error) {
+      console.error('Error al solicitar nueva tarjeta:', error);
+      res.status(500).json({ mensaje: 'Error al solicitar nueva tarjeta' });
+    } else {
+      res.status(201).json({ mensaje: 'Tarjeta solicitada exitosamente', id_tarjeta: results.insertId });
+    }
+  });
+});
+
+// Ruta para activar una tarjeta
+app.post('/tarjetas/activar', authenticateToken, (req, res) => {
+  const { id_tarjeta } = req.body;
+
+  const query = 'UPDATE tarjetas SET activa = 1 WHERE id_tarjeta = ? AND id_usuario = ?';
+  db.query(query, [id_tarjeta, req.userId], (error, results) => {
+    if (error) {
+      console.error('Error al activar tarjeta:', error);
+      res.status(500).json({ mensaje: 'Error al activar tarjeta' });
+    } else if (results.affectedRows === 0) {
+      res.status(404).json({ mensaje: 'Tarjeta no encontrada o no pertenece al usuario' });
+    } else {
+      res.status(200).json({ mensaje: 'Tarjeta activada exitosamente' });
+    }
+  });
+});
+
+// Ruta para bloquear una tarjeta
+app.post('/tarjetas/bloquear', authenticateToken, (req, res) => {
+  const { id_tarjeta } = req.body;
+  const query = 'UPDATE tarjetas SET bloqueada = 1 WHERE id_tarjeta = ? AND id_usuario = ?';
+  db.query(query, [id_tarjeta, req.userId], (error, results) => {
+    if (error) {
+      console.error('Error al bloquear tarjeta:', error);
+      res.status(500).json({ mensaje: 'Error al bloquear tarjeta' });
+    } else {
+      res.status(200).json({ mensaje: 'Tarjeta bloqueada exitosamente' });
+    }
+  });
+});
+
+// Ruta para desbloquear una tarjeta
+app.post('/tarjetas/desbloquear', authenticateToken, (req, res) => {
+  const { id_tarjeta } = req.body;
+
+  const query = 'UPDATE tarjetas SET bloqueada = 0 WHERE id_tarjeta = ? AND id_usuario = ?';
+  db.query(query, [id_tarjeta, req.userId], (error, results) => {
+    if (error) {
+      console.error('Error al desbloquear tarjeta:', error);
+      res.status(500).json({ mensaje: 'Error al desbloquear tarjeta' });
+    } else {
+      res.status(200).json({ mensaje: 'Tarjeta desbloqueada exitosamente' });
+    }
+  });
+});
+
+//#endregion
+
 // Inicia el servidor
 app.listen(3001, () => {
   console.log('Servidor iniciado en el puerto 3001');

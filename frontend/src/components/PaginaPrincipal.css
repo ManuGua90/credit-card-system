@@ -35,13 +35,17 @@
 
 .card {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
   margin: 10px;
   padding: 20px;
   border-radius: 10px;
   background-color: #ffffff;
-  width: 300px;
+  width: 320;
+  transition: background-color 0.3s ease-in-out;
   border-left: 5px solid #3498db; /* Añade un toque de color */
 }
+
+
 
 .card h3 {
   color: #2c3e50;
@@ -51,9 +55,53 @@
 .card p {
   color: #7f8c8d;
 }
+.card-activa {
+  background-color: #c8e6c9; /* Un verde pastel más suave */
+}
+
+.card-bloqueada {
+  background-color: #ffd0e0; /* Un rosa pastel menos saturado */
+}
 
 .loading {
   text-align: center;
   font-size: 20px;
   color: #e74c3c;
+}
+
+.button-container {
+  display: flex; /* Alinea los botones horizontalmente */
+  gap: 10px; /* Espacio entre los botones */
+}
+
+.button {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: white; /* Texto blanco para todos los botones */
+}
+
+.button-activar {
+  background-color: #b8e994; /* Verde pastel */
+}
+
+.button-bloquear {
+  background-color: #ff8787; /* Rojo pastel */
+}
+
+.button-desbloquear {
+  background-color: #fcc419; /* Amarillo pastel */
+}
+
+.card-inactiva {
+  background-color: #e0e0e0; /* Color gris para tarjetas inactivas */
+}
+
+.button-disabled {
+  background-color: #cccccc; /* Color gris para botones deshabilitados */
+  cursor: not-allowed;
+  opacity: 0.5;
 }
