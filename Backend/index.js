@@ -10,8 +10,8 @@ app.use(cors());
 
 // Configuración de la conexión a la base de datos MySQL
 const db = mysql.createConnection({
-  // host: 'mi-db',
-  host: '3.15.147.101',
+  host: 'mi-db',
+  // host: '3.15.147.101',
   user: 'pruebas',
   password: 'pruebas',
   database: 'pruebas',
