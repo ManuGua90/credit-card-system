@@ -5,6 +5,7 @@ import './PaginaPrincipal.css';
 import Swal from 'sweetalert2';
 import Navbar from './Navbar';  // Ajusta la ruta según sea necesario
 
+
 const PaginaPrincipal = () => {
   const [usuario, setUsuario] = useState(null);
   const [tarjetas, setTarjetas] = useState([]);
@@ -20,7 +21,7 @@ const PaginaPrincipal = () => {
       }
 
       try {
-        const usuarioResponse = await axios.get('/usuario', { headers: { Authorization: token } });
+        const usuarioResponse = await axios.get('/api/auth/usuario', { headers: { Authorization: token } });
         setUsuario(usuarioResponse.data);
         const tarjetasResponse = await axios.get('/usuario/tarjetas', { headers: { Authorization: token } });
         setTarjetas(tarjetasResponse.data);
@@ -101,13 +102,122 @@ const PaginaPrincipal = () => {
     });
   };
 
+  const verEstadoDeCuenta = () => {
+    const token = localStorage.getItem('token');
+  
+    // Primero, obtenemos la lista de tarjetas activas
+    axios.get('/tarjetas/activas', {
+      headers: { Authorization: token }
+    }).then(response => {
+      const tarjetas = response.data;
+      const tarjetasOptions = tarjetas.map(tarjeta =>
+        `<option value="${tarjeta.id_tarjeta}">${tarjeta.numero_tarjeta}</option>`
+      ).join('');
+  
+      Swal.fire({
+        title: 'Selecciona una Tarjeta',
+        html: `
+          <select id="idTarjeta" class="swal2-input">
+            <option value="" disabled selected>Selecciona tu tarjeta</option>
+            ${tarjetasOptions}
+          </select>
+        `,
+        confirmButtonText: 'Ver Estado de Cuenta',
+        focusConfirm: false,
+        preConfirm: () => {
+          const idTarjeta = Swal.getPopup().querySelector('#idTarjeta').value;
+          if (!idTarjeta) {
+            Swal.showValidationMessage('Por favor seleccione una tarjeta');
+            return;
+          }
+          return { idTarjeta };
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          // Aquí mostramos el estado de cuenta de la tarjeta seleccionada
+          axios.get(`/estado-cuenta/${result.value.idTarjeta}`, {
+            headers: { Authorization: token }
+          }).then(resp => {
+            const cuenta = resp.data;
+            Swal.fire({
+              title: 'Estado de Cuenta',
+              html: `
+                <p>Nombre: ${cuenta.nombre} ${cuenta.apellido}</p>
+                <p>Límite de Crédito: $${cuenta.limite_credito}</p>
+                <p>Saldo Gastado: $${cuenta.saldo_gastado}</p>
+              `
+            });
+          });
+        }
+      });
+    }).catch(error => {
+      Swal.fire('Error', 'No se pudo obtener la lista de tarjetas.', 'error');
+    });
+  };
+
+  const verMovimientosTarjeta = () => {
+    const token = localStorage.getItem('token');
+  
+    axios.get('/tarjetas/activas', {
+      headers: { Authorization: token }
+    }).then(response => {
+      const tarjetas = response.data;
+      const tarjetasOptions = tarjetas.map(tarjeta =>
+        `<option value="${tarjeta.id_tarjeta}">${tarjeta.numero_tarjeta}</option>`
+      ).join('');
+  
+      Swal.fire({
+        title: 'Selecciona una Tarjeta',
+        html: `
+          <select id="idTarjeta" class="swal2-input">
+            <option value="" disabled selected>Selecciona tu tarjeta</option>
+            ${tarjetasOptions}
+          </select>
+        `,
+        confirmButtonText: 'Ver Movimientos',
+        focusConfirm: false,
+        preConfirm: () => {
+          const idTarjeta = Swal.getPopup().querySelector('#idTarjeta').value;
+          if (!idTarjeta) {
+            Swal.showValidationMessage('Por favor seleccione una tarjeta');
+            return;
+          }
+          return { idTarjeta };
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          axios.get(`/movimientos/${result.value.idTarjeta}`, {
+            headers: { Authorization: token }
+          }).then(resp => {
+            const movimientos = resp.data;
+            const movimientosHtml = movimientos.map(mov => {
+              const formattedDate = new Date(mov.fecha).toLocaleDateString("es-ES", {
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              });
+              return `<p>${formattedDate}: ${mov.descripcion} - $${mov.monto} (${mov.tipo_transaccion})</p>`;
+            }).join('');
+            Swal.fire({
+              title: 'Movimientos de la Tarjeta',
+              html: movimientosHtml,
+              width: 900
+            });
+          }).catch(error => {
+            Swal.fire('Error', 'No se pudo obtener los movimientos de la tarjeta.', 'error');
+          });
+        }
+      });
+    }).catch(error => {
+      Swal.fire('Error', 'No se pudo obtener la lista de tarjetas.', 'error');
+    });
+  };
+  
   if (!usuario) {
     return <div className="loading">Cargando...</div>;
   }
 
   return (
     <div className="container">
-      <Navbar onSolicitarTarjeta={solicitarNuevaTarjeta} />
+      <Navbar onSolicitarTarjeta={solicitarNuevaTarjeta} onEstadoCuenta={verEstadoDeCuenta} onMovimientosTarjeta={verMovimientosTarjeta} />
       <h2 className="title">Página Principal</h2>
       <p className="welcome-message">Bienvenido, {usuario.nombre} {usuario.apellido}</p>
       <p className="details">Email: {usuario.email}</p>

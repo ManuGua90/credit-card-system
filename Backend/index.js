@@ -257,6 +257,66 @@ app.post('/tarjetas/desbloquear', authenticateToken, (req, res) => {
 
 //#endregion
 
+
+//#region estados cuenta
+// Endpoint para obtener movimientos de una tarjeta específica
+app.get('/movimientos/:idTarjeta', authenticateToken, (req, res) => {
+  const { idTarjeta } = req.params;
+  const query = `
+    SELECT t.monto, t.fecha, t.descripcion, tt.descripcion as tipo_transaccion
+    FROM transacciones t
+    INNER JOIN tipo_transaccion tt ON t.id_tipo = tt.id_tipo
+    WHERE t.id_tarjeta = ?
+    ORDER BY t.fecha DESC
+  `;
+
+  db.query(query, [idTarjeta], (error, results) => {
+    if (error) {
+      console.error('Error al obtener movimientos:', error);
+      res.status(500).json({ mensaje: 'Error al obtener movimientos' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+// Endpoint para obtener el estado de cuenta de una tarjeta
+app.get('/estado-cuenta/:idTarjeta', authenticateToken, (req, res) => {
+  const { idTarjeta } = req.params;
+  const query = `
+    SELECT t.id_tarjeta, u.nombre, u.apellido, t.limite_credito, SUM(tr.monto) AS saldo_gastado
+    FROM tarjetas t
+    JOIN usuarios u ON t.id_usuario = u.id_usuario
+    LEFT JOIN transacciones tr ON t.id_tarjeta = tr.id_tarjeta
+    WHERE t.id_tarjeta = ?
+    GROUP BY t.id_tarjeta
+  `;
+
+  db.query(query, [idTarjeta], (error, results) => {
+    if (error) {
+      console.error('Error al obtener el estado de cuenta:', error);
+      res.status(500).json({ mensaje: 'Error al obtener el estado de cuenta' });
+    } else {
+      res.status(200).json(results[0]);
+    }
+  });
+});
+
+//#endregion
+app.get('/tarjetas/activas', authenticateToken, (req, res) => {
+  const usuarioId = req.userId; // Asegúrate de tener acceso al ID del usuario autenticado
+  const query = 'SELECT id_tarjeta, numero_tarjeta FROM tarjetas WHERE id_usuario = ? AND activa = 1';
+  db.query(query, [usuarioId], (error, results) => {
+    if (error) {
+      console.error('Error al obtener tarjetas activas:', error);
+      res.status(500).json({ mensaje: 'Error al obtener tarjetas activas' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+
 // Inicia el servidor
 app.listen(3001, () => {
   console.log('Servidor iniciado en el puerto 3001');
