@@ -1,26 +1,4 @@
-/* RegistroUsuario.css
-.form-container {
-    max-width: 600px;
-    margin: auto;
-  }
-  
-  .input-field {
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .submit-button {
-    padding: 10px 20px;
-    border-radius: 5px;
-    background-color: blue;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-   */
-   .transaction-form {
+.transaction-form {
     max-width: 500px;
     margin: auto;
     padding: 20px;

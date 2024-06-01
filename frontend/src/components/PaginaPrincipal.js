@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
 import './PaginaPrincipal.css';
+import ReactDOM from 'react-dom';  // Importar ReactDOM
 import Swal from 'sweetalert2';
 import Navbar from './Navbar';  // Ajusta la ruta según sea necesario
+import TransactionForm from './TransactionForm';  // Asegúrate de que la ruta es correcta
+
 
 
 const PaginaPrincipal = () => {
@@ -11,6 +14,11 @@ const PaginaPrincipal = () => {
   const [tarjetas, setTarjetas] = useState([]);
   const [refreshCounter, setRefreshCounter] = useState(0); // Estado para forzar la re-renderización
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');  // Borrar el token almacenado
+    navigate('/');  // Redirigir al usuario a la página de inicio de sesión
+  };
 
   useEffect(() => {
     const fetchUsuario = async () => {
@@ -211,13 +219,33 @@ const PaginaPrincipal = () => {
     });
   };
   
+  const mostrarFormularioTransaccion = () => {
+    Swal.fire({
+      title: 'Crear Transacción',
+      html: '<div id="swal-form-container"></div>',  // Div contenedor para el formulario
+      didOpen: () => {
+        ReactDOM.render(
+          <TransactionForm
+            token={localStorage.getItem('token')}
+            handleClose={() => Swal.close()}
+          />,
+          document.getElementById('swal-form-container')
+        );
+      },
+      willClose: () => {
+        ReactDOM.unmountComponentAtNode(document.getElementById('swal-form-container')); // Limpiar después de cerrar
+      }
+    });
+  };
+  
+
   if (!usuario) {
     return <div className="loading">Cargando...</div>;
   }
 
   return (
     <div className="container">
-      <Navbar onSolicitarTarjeta={solicitarNuevaTarjeta} onEstadoCuenta={verEstadoDeCuenta} onMovimientosTarjeta={verMovimientosTarjeta} />
+      <Navbar onSolicitarTarjeta={solicitarNuevaTarjeta} onEstadoCuenta={verEstadoDeCuenta} onMovimientosTarjeta={verMovimientosTarjeta} onCrearTransaccion={mostrarFormularioTransaccion}  onLogout={handleLogout}/>
       <h2 className="title">Página Principal</h2>
       <p className="welcome-message">Bienvenido, {usuario.nombre} {usuario.apellido}</p>
       <p className="details">Email: {usuario.email}</p>
