@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     container_name: mi-app-backend
-    build: .
+    build: ./Backend
     ports:
       - "3001:3001"
     environment:
@@ -11,8 +11,7 @@ services:
     depends_on:
       - db
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - .:/src/app
     command: npm run dev
 
   db:
