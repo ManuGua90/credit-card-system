@@ -2,7 +2,7 @@
 FROM node:16-alpine
 
 # Establecer el directorio de trabajo dentro del contenedor
-WORKDIR /usr/src/app
+WORKDIR .
 
 # Copiar archivos de configuración de Node.js y instalar dependencias
 COPY package*.json ./
@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 3001
 
 # Comando para ejecutar la aplicación
-CMD ["node", "app.js"]
+CMD ["node", "index.js"]

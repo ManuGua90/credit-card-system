@@ -11,9 +11,9 @@ services:
     depends_on:
       - db
     volumes:
-      - .:/src/app
-    command: npm run dev
-
+      - .:/usr/src/app
+    command: npm start
+    restart: unless-stopped
   db:
     container_name: mi-db
     image: mysql:5.7
