@@ -21,7 +21,7 @@ const PaginaPrincipal = () => {
       }
 
       try {
-        const usuarioResponse = await axios.get('/usuario', { headers: { Authorization: token } });
+        const usuarioResponse = await axios.get('/api/auth/usuario', { headers: { Authorization: token } });
         setUsuario(usuarioResponse.data);
         const tarjetasResponse = await axios.get('/usuario/tarjetas', { headers: { Authorization: token } });
         setTarjetas(tarjetasResponse.data);
