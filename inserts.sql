@@ -56,6 +56,8 @@ INSERT INTO `pruebas`.`tarjetas` (`numero_tarjeta`, `fecha_vencimiento`, `cvv`, 
 -- Inserts para la tabla tipo_transaccion
 INSERT INTO `pruebas`.`tipo_transaccion` (`descripcion`) VALUES ('credito');
 INSERT INTO `pruebas`.`tipo_transaccion` (`descripcion`) VALUES ('debito');
+INSERT INTO `pruebas`.`tipo_transaccion` (`descripcion`) VALUES ('transferencia');
+INSERT INTO `pruebas`.`tipo_transaccion` (`descripcion`) VALUES ('pago');
 
 -- Inserts para la tabla transacciones
 INSERT INTO `pruebas`.`transacciones` (`monto`, `descripcion`, `id_tipo`, `id_tarjeta`) VALUES (1000, 'Compra en tienda', 1, 1);
