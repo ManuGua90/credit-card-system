@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `pruebas`.`tarjetas` (
   `activa` TINYINT(4) NOT NULL DEFAULT '0',
   `limite_credito` INT(11) NOT NULL DEFAULT '3500',
   PRIMARY KEY (`id_tarjeta`),
-  INDEX `fk_tarjetas_usuarios_idx` (`id_usuario` ASC) VISIBLE,
+  INDEX `fk_tarjetas_usuarios_idx` (`id_usuario` ASC),
   CONSTRAINT `fk_tarjetas_usuarios`
     FOREIGN KEY (`id_usuario`)
     REFERENCES `pruebas`.`usuarios` (`id_usuario`)
@@ -91,9 +91,9 @@ CREATE TABLE IF NOT EXISTS `pruebas`.`transacciones` (
   `id_tipo` INT(11) NOT NULL,
   `id_tarjeta` INT(11) NOT NULL,
   PRIMARY KEY (`id_transaccion`),
-  INDEX `fk_transacciones_tipo_transaccion1_idx` (`id_transaccion` ASC) VISIBLE,
-  INDEX `fk_transacciones_tarjetas1_idx` (`id_tarjeta` ASC) VISIBLE,
-  INDEX `fk_transacciones_tipo_transaccion1` (`id_tipo` ASC) VISIBLE,
+  INDEX `fk_transacciones_tipo_transaccion1_idx` (`id_transaccion` ASC) ,
+  INDEX `fk_transacciones_tarjetas1_idx` (`id_tarjeta` ASC) ,
+  INDEX `fk_transacciones_tipo_transaccion1` (`id_tipo` ASC) ,
   CONSTRAINT `fk_transacciones_tarjetas1`
     FOREIGN KEY (`id_tarjeta`)
     REFERENCES `pruebas`.`tarjetas` (`id_tarjeta`)
