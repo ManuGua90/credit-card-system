@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: mi-app-backend
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run dev
+
+  db:
+    container_name: mi-db
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: pruebas
+      MYSQL_DATABASE: pruebas
+      MYSQL_USER: pruebas
+      MYSQL_PASSWORD: pruebas
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./bd.sql:/docker-entrypoint-initdb.d/bd.sql  # Asegúrate de que la ruta al archivo bd.sql es correcta
+
+volumes:
+  db-data:
