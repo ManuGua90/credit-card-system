@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
 import './InicioSesion.css';
-import RegistroUsuario from './RegistroUsuario'; // Asegúrate de que la ruta es correcta
+// import RegistroUsuario from './RegistroUsuario'; // Asegúrate de que la ruta es correcta
 
 const InicioSesion = () => {
   const [email, setEmail] = useState('');
   const [password, setpassword] = useState('');
-  const [mostrarRegistro, setMostrarRegistro] = useState(false);
+  //const [mostrarRegistro, setMostrarRegistro] = useState(false);
   const navigate = useNavigate();
 
+    // Función para manejar el clic en el botón de registro
+    const handleRegisterClick = () => {
+      navigate('/registro'); // Asegúrate de que '/register' es la ruta correcta hacia tu componente de Registro
+    };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -26,9 +30,9 @@ const InicioSesion = () => {
     }
   };
 
-  if (mostrarRegistro) {
-    return <RegistroUsuario />;
-  }
+  // if (mostrarRegistro) {
+  //   return <RegistroUsuario />;
+  // }
 
   return (
     <div className="inicio-sesion">
@@ -53,9 +57,9 @@ const InicioSesion = () => {
           />
         </div>
         <button type="submit" className="submit-button">Iniciar Sesión</button>
-        <button type="button" onClick={() => setMostrarRegistro(true)} className="register-button">
-          Registrarse
-        </button>
+        <button type="button" onClick={handleRegisterClick} className="register-button">
+        Registrarse
+      </button>
       </form>
     </div>
   );

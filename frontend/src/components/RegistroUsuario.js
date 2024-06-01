@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import axios from '../axios';
+import { useNavigate } from 'react-router-dom';
 import './RegistroUsuario.css';
+
 const RegistroUsuario = () => {
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
   const [password, setpassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,13 +25,14 @@ const RegistroUsuario = () => {
       setApellido('');
       setEmail('');
       setpassword('');
+      navigate('/');
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <div className="form-container">
+    <div className="transaction-form">
       <h2>Registro de Usuario</h2>
       <form onSubmit={handleSubmit}>
         <div>

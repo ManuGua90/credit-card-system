@@ -10,7 +10,8 @@ app.use(cors());
 
 // Configuración de la conexión a la base de datos MySQL
 const db = mysql.createConnection({
-  host: 'mi-db',
+  // host: 'mi-db',
+  host: '3.15.147.101',
   user: 'pruebas',
   password: 'pruebas',
   database: 'pruebas',
@@ -316,6 +317,22 @@ app.get('/tarjetas/activas', authenticateToken, (req, res) => {
   });
 });
 
+app.post('/transacciones/crear', authenticateToken, (req, res) => {
+  const { monto, descripcion, id_tipo, idTarjeta } = req.body;
+
+  const query = `
+    INSERT INTO transacciones (monto, descripcion, id_tipo, id_tarjeta)
+    VALUES (?, ?, ?, ?)
+  `;
+  
+  db.query(query, [monto, descripcion, id_tipo, idTarjeta], (error, results) => {
+    if (error) {
+      console.error('Error al registrar la transacción:', error);
+      return res.status(500).json({ mensaje: 'Error al registrar la transacción' });
+    }
+    res.status(201).json({ mensaje: 'Transacción creada exitosamente', transaccionId: results.insertId });
+  });
+});
 
 // Inicia el servidor
 app.listen(3001, () => {
