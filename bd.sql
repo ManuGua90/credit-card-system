@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS `pruebas`.`usuarios` (
   `password` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id_usuario`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 12
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -60,7 +59,6 @@ CREATE TABLE IF NOT EXISTS `pruebas`.`tarjetas` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-AUTO_INCREMENT = 15
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -74,7 +72,6 @@ CREATE TABLE IF NOT EXISTS `pruebas`.`tipo_transaccion` (
   `descripcion` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id_tipo`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 3
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -105,7 +102,6 @@ CREATE TABLE IF NOT EXISTS `pruebas`.`transacciones` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-AUTO_INCREMENT = 11
 DEFAULT CHARACTER SET = utf8;
 
 
